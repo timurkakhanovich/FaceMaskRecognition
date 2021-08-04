@@ -1,0 +1,13 @@
+epochs: 154
+batch size: 32
+margin: 0.5
+optimizer: Adagrad(model.parameters(), lr=0.1, initial_accumulator_value=0.1)
+
+best result:
+Accuracy on LFW: 0.8004+-0.0238
+Precision 0.7739+-0.7739
+Recall 0.8489+-0.8489
+F1-score: 0.8097+-0.8097
+ROC Area Under Curve: 0.8691
+Best distance threshold: 1.19+-0.00
+TAR: 0.0790+-0.0258 @ FAR: 0.0010
