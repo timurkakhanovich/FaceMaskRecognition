@@ -1,0 +1,5 @@
+Data/
+.venv
+*.txt
+.python-version
+.vscode
