@@ -1,10 +1,17 @@
+from typing import Tuple
 import numpy as np
 
 from sklearn.metrics import auc
 from sklearn.model_selection import KFold
 from scipy import interpolate
 
-def evaluate_lfw(distances, labels, num_folds=10, far_target=1e-1):
+
+def evaluate_lfw(
+    distances: np.ndarray,
+    labels: np.ndarray,
+    num_folds: int = 10,
+    far_target: float = 1e-1,
+) -> Tuple[float]:
     # Calculate ROC metrics
     thresholds_roc = np.arange(0, 4, 0.01)
     TPR, FPR, precision, recall, accuracy, best_distances = \
@@ -22,7 +29,13 @@ def evaluate_lfw(distances, labels, num_folds=10, far_target=1e-1):
 
     return TPR, FPR, precision, recall, accuracy, roc_auc, best_distances, TAR, FAR
 
-def calculate_roc_values(thresholds, distances, labels, num_folds):
+
+def calculate_roc_values(
+    thresholds: np.ndarray,
+    distances: np.ndarray,
+    labels: np.ndarray,
+    num_folds: int,
+) -> Tuple[float]:
     num_pairs = min(len(labels), len(distances))
     num_thresholds = len(thresholds)
     k_fold = KFold(n_splits=num_folds, shuffle=False)
@@ -62,7 +75,8 @@ def calculate_roc_values(thresholds, distances, labels, num_folds):
     
     return TPR, FPR, precision, recall, accuracy, best_distances
 
-def calculate_metrics(threshold, dist, actual_issame):
+
+def calculate_metrics(threshold: float, dist: float, actual_issame: bool) -> Tuple[float]:
     predict_issame = np.less(dist, threshold)
 
     TPs = np.sum(np.logical_and(predict_issame, actual_issame))
@@ -87,7 +101,14 @@ def calculate_metrics(threshold, dist, actual_issame):
 
     return TPR, FPR, precision, recall, accuracy
 
-def calculate_val(thresholds_val, distances, labels, far_target=1e-3, num_folds=10):
+
+def calculate_val(
+    thresholds_val: float,
+    distances: np.ndarray,
+    labels: np.ndarray,
+    far_target: float = 1e-3,
+    num_folds: int = 10,
+) -> Tuple[float]:
     num_pairs = min(len(distances), len(labels))
     num_thresholds = len(thresholds_val)
     k_folds = KFold(n_splits=num_folds, shuffle=False)
@@ -116,7 +137,8 @@ def calculate_val(thresholds_val, distances, labels, far_target=1e-3, num_folds=
     
     return TAR, FAR
 
-def calculate_val_far(threshold, dist, actual_issame):
+
+def calculate_val_far(threshold: float, dist: float, actual_issame: bool) -> Tuple[float]:
     # If distance is less than threshold, then prediction is set to True
     predict_issame = np.less(dist, threshold)
 

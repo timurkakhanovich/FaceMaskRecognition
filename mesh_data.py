@@ -1,12 +1,14 @@
+from pathlib import Path
+from typing import Callable
 import dlib
 import cv2
-import os
 import numpy as np
 import imutils
-from imutils.face_utils import rect_to_bb, shape_to_np
+from imutils.face_utils import shape_to_np
 from tqdm import tqdm
 
-def fill_padding(image):
+
+def fill_padding(image: np.ndarray) -> np.ndarray:
     ww = 220
     hh = 220
     color = (0, 0, 0)
@@ -28,7 +30,13 @@ def fill_padding(image):
 
     return result
 
-def mesh_image(img_path, detector, predictor, save_path):
+
+def mesh_image(
+    img_path: Path, 
+    detector: Callable,
+    predictor: dlib.shape_predictor,
+    save_path: Path,
+) -> None:
     image = cv2.imread(img_path)
     image = imutils.resize(image, width=1000)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -51,27 +59,31 @@ def mesh_image(img_path, detector, predictor, save_path):
         image = image[y_min-1000 : y_max+1000, x_min-1000 : x_max+1000]
         image = fill_padding(image)
         cv2.imwrite(save_path, image)
-    else:
-        return
 
-def main():
-    os.chdir(r'E:\\Projects\\CourseWork\\face_mask_recognition')
-    imagePath = r'VGG-Face2-Data\\'
+
+def main() -> None:
+    image_path = Path("VGG-Face2-Data/")
+    output_path = Path("masked_data/")
 
     detector = dlib.get_frontal_face_detector()
-    predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
+    predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
-    for name in tqdm(os.listdir(imagePath)[100:106]):
-        if not os.path.exists(r'data2\\masked\\' + name):
-            os.mkdir(r'data2\\masked\\' + name)
+    for name in tqdm(image_path.glob("**/*")[100:106]):
+        name_dir = output_path / name
+        name_dir.mkdir(parents=True, exist_ok=True)
 
-        currNamePath = imagePath + name
-        for img in os.listdir(currNamePath):
+        current_path_name = image_path / name
+        for img in current_path_name.glob("**/*"):
             try:
-                mesh_image(img_path=currNamePath + '\\' + img, detector=detector, 
-                            predictor=predictor, save_path=r'data2\\masked\\' + name + '\\' + img)
+                mesh_image(
+                    img_path=img,
+                    detector=detector, 
+                    predictor=predictor,
+                    save_path=name_dir / img.name,
+                )
             except:
                 continue
+
 
 if __name__ == "__main__":
     main()
